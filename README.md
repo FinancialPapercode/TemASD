@@ -76,7 +76,7 @@ python run.py --dataset=eth-2019jan
 Main arguments:
 
 ```
---dataset [eth-2019jan,eth-2018jan,blur]: the dataset to run
+--dataset [eth-2019jan,eth-2018jan,blur,PlusTokenPonzi]: the dataset to run
 --n_layers: number of GNN layers
 --pred_size: total number of predicted anomaly subgraphs
 --agent_lr: the learning rate of Anomalous Subgraph Refinement
