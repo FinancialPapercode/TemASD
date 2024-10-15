@@ -1,7 +1,6 @@
-# TemASD
-# The code for TemASD
+# The code for  TempASD
 
-This repo contains the source code for the TemASD model.
+This repo contains the source code for the TempASD model.
 
 ## Programming language
 
@@ -15,7 +14,7 @@ This repo contains the source code for the TemASD model.
 
 2. Install **torch-geometric** package with version 2.0.1
 
-   Note that it may need to appropriately install the package `torch-geometric` based on the CUDA version (or CPU version if GPU is not available). Please refer to the official website https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html for more information of installing prerequisites.
+   Note that it may need to appropriately install the package `torch-geometric` based on the CUDA version (or CPU version if GPU is not available). Please refer to the official website https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html for more information on installing prerequisites.
 
    For example (Mac / CPU)
 
@@ -41,10 +40,10 @@ Intel Xeon Platinum 8370C processor 32-core 2.8G CPU
 
 The ETH datasets are data from the Ethereum blockchain shared by Google BigQuery[1]. They contain token transactions from source to sink addresses with the transaction amount. The ETH datasets are also used in the SOTA work AntiBenford [2].
 
-Our datasets are available on Google drive: https://drive.google.com/drive/folders/1TOeVzgQJAYdlGhaabtGcg8WDE9e73l3z?usp=sharing 
+Our datasets are available on Google Drive: https://drive.google.com/drive/folders/1TOeVzgQJAYdlGhaabtGcg8WDE9e73l3z?usp=sharing 
 
-- dataset/eth-2018jan-time
-- dataset/eth-2019jan-time
+- dataset/eth-2018jan
+- dataset/eth-2019jan
 
 Each of them contains a ground-truth subgraphs file `{name}-1.90.anomaly.txt` and an edge file `{name}-1.90.ungraph.txt`.
 
@@ -54,26 +53,32 @@ The Blur dataset is a transaction dataset from the NFT marketplace [4], which is
 
 dataset/blur contains a file with abnormal subgraphs `{name}-1.90.anomaly.txt` and an edge file `{name}-1.90.ungraph.txt`.
 
+### PlusTokenPonzi
+
+The PlusTokenPonzi dataset [5] is a real Ethereum blockchain transaction dataset involving money laundering activities from EthereumHeist. It includes detailed information such as transaction timestamps and amounts, service provider address labels, hierarchical levels of laundering addresses, etc. This is the first publicly available dataset with ground-truth data on money laundering.
+
+dataset/PlusTokenPonzi contains a file with abnormal subgraphs {name}-1.90.anomaly.txt and an edge file {name}-1.90.ungraph.txt
+
 ## Data preprocessing
 
+Consistent with AntiBenford [2], transactions valued at less than 1 unit are excluded during preprocessing. The primary step involves constructing the graph. To represent multiple transactions between two nodes, we combine them into a single edge. Each edge is associated with the transaction frequency and the financial distribution, i.e., the probabilities of transaction amounts starting with a certain digit. This resulting input graph is used for our analysis.
 
-Following AntiBenford [2], transactions with values less than 1 unit are excluded during preprocessing. Since our goal is to discover anomalous subgraphs in temporal networks, we retain the timestamps associated with the transactions.
-The temporal graph is divided into multiple snapshots at equal time intervals, with a sequential relationship between these snapshots. For each time interval, we represent multiple transactions between two nodes as a single edge. Each edge is associated with both the transaction frequency and the financial distribution, which includes the probabilities of transaction amounts starting with each digit o. This forms the input graph for our analysis.
-As the ETH datasets lack inherent anomaly labels, we use the advanced method proposed by [3] and [2] as a reference.
+The edge file requires pre-processing. The following steps need to be taken:
 
-## How to run the code for RADIO
+- The pre-processing details are in /dataset/eth-2018jan/sum.py and /dataset/eth-2019jan/sum.py.
+
+## How to run the code for  TempASD
 
 ```
-python run.py --dataset=eth-2019jan-time
+python run.py --dataset=eth-2019jan
 ```
 
 Main arguments:
 
 ```
---dataset [eth-2019jan-time,eth-2018jan-time,blur]: the dataset to run
---n_layers: ego-net dimensions & number of GNN layers
+--dataset [eth-2019jan,eth-2018jan,blur]: the dataset to run
+--n_layers: number of GNN layers
 --pred_size: total number of predicted anomaly subgraphs
---time_intervial: time interval of snapshots
 --agent_lr: the learning rate of Anomalous Subgraph Refinement
 ```
 
@@ -81,8 +86,12 @@ Main arguments:
 
 ## References
 
-[1]https://www.kaggle.com/bigquery/ethereum- blockchain
+[1]https://www.kaggle.com/bigquery/ethereum-blockchain
 
-[2]T. Chen and C. Tsourakakis, “Antibenford subgraphs: Unsupervised anomaly detection in financial networks,” (KDD2022)
+[2]T. Chen and C. Tsourakakis, "Antibenford subgraphs: Unsupervised anomaly detection in financial networks", (KDD2022)
 
-[3]L. Lin and P. Yuan and R.-H. Li and H. Jin, “Mining diversified top-*r* r lasting cohesive subgraphs on temporal networks,” IEEE Transactions on Big Data, vol. 8, no. 6, pp. 1537–1549, 2021.
+[3]Z.Chenyu, C.Hongzhou, W.Hao, Z.Junyu, and C Wei, "ARTEMIS: Detecting Airdrop Hunters in NFT Markets with a Graph Learning System", (WWW2024)
+
+[4]https://etherscan.io/
+
+[5]https://github.com/lindan113/EthereumHeist?tab=readme-ov-file
